@@ -6,7 +6,7 @@ require (
 	github.com/ipfs/go-log/v2 v2.9.2
 	github.com/libp2p/go-libp2p v0.51.0
 	github.com/marcopolo/simnet v0.0.7
-	github.com/mudler/edgevpn v0.36.0
+	github.com/mudler/edgevpn v0.37.0
 	github.com/multiformats/go-multiaddr v0.16.1
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
@@ -22,6 +22,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
+	go.opentelemetry.io/otel/log v1.47.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 )
 
@@ -39,7 +40,7 @@ require (
 	github.com/dunglas/httpsfv v1.1.1 // indirect
 	github.com/filecoin-project/go-clock v0.1.0 // indirect
 	github.com/flynn/noise v1.1.0 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/btree v1.1.2 // indirect
@@ -124,9 +125,9 @@ require (
 	github.com/vishvananda/netns v0.0.5 // indirect
 	github.com/whyrusleeping/go-keyspace v0.0.0-20160322163242-5b898ac5add1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.44.0 // indirect
-	go.opentelemetry.io/otel/metric v1.44.0 // indirect
-	go.opentelemetry.io/otel/trace v1.44.0 // indirect
+	go.opentelemetry.io/otel v1.47.0 // indirect
+	go.opentelemetry.io/otel/metric v1.47.0 // indirect
+	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/mock v0.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -151,6 +152,3 @@ require (
 
 // mudler's fork, which edgevpn also uses, runs pubsub over relayed connections and keeps a peer's subscriptions when a pubsub stream is reset.
 replace github.com/libp2p/go-libp2p-pubsub => github.com/mudler/go-libp2p-pubsub v0.0.0-20261110174907-d598e01e0c5c
-
-// edgevpn v0.36.0 plus mudler/edgevpn#1093 (one stream per peer for VPN packets), until a release has it.
-replace github.com/mudler/edgevpn => github.com/jimmykarily/edgevpn v0.0.0-20261112073228-dd68bbc1bffe
