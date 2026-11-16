@@ -186,12 +186,18 @@ func runNetChange(onLocal bool) {
 	mu.Lock()
 	n := netChangeNode
 	ok := n != nil && currentNode == n && hostReady
-	ctx, r := sessionCtx, currentMDNS
+	ctx, r, p := sessionCtx, currentMDNS, currentPause
 	mu.Unlock()
 	if !ok || ctx == nil {
 		return
 	}
 	netChangeSteps(ctx, n, hostOf(n), r, onLocal)
+	// The redial reaches the devices whose address the phone knows. The
+	// discovery round finds the others and announces the phone's new
+	// addresses at the meeting point.
+	if p != nil {
+		p.wakeUp("the network changed")
+	}
 }
 
 // netChangeSteps does the network work of one run. Tests replace it.

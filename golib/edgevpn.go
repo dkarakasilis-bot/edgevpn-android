@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	dht "github.com/libp2p/go-libp2p-kad-dht"
 	crypto "github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/mudler/edgevpn/pkg/config"
 	"github.com/mudler/edgevpn/pkg/node"
@@ -39,6 +40,9 @@ var (
 	tunFile  *os.File
 	// currentMDNS runs mDNS for the current session; nil when the VPN is off.
 	currentMDNS *mdnsRunner
+	// currentPause holds back DHT discovery for the current session; nil
+	// when the VPN is off.
+	currentPause *discoveryPause
 )
 
 // GenerateNodeKey returns a new Ed25519 private key in libp2p's marshaled
@@ -88,7 +92,8 @@ func networkConfig(token, address string) config.Config {
 			// discovery ticker backs off up to this interval, and at zero
 			// it starts a new round as soon as the last one ends: without a
 			// network that is many rounds a second, each one logged.
-			Interval: 720 * time.Second,
+			Interval:   720 * time.Second,
+			DHTOptions: []dht.Option{dht.RoutingTableRefreshPeriod(dhtRefreshPeriod)},
 		},
 		// Match the CLI defaults (cmd/util.go: autorelay=true, holepunch=true).
 		// These are essential for NAT traversal when both peers are behind NAT:
@@ -172,6 +177,9 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 
 	llger := &bufferLogger{}
 	cfg := networkConfig(normalizeToken(token), address)
+	pause := newDiscoveryPause(time.Now)
+	cfg.Discovery.Pause = pause.Pause
+	cfg.Discovery.Wake = pause.wake
 
 	SetMinLogLevel(cfg.LogLevel)
 	nodeOpts, vpnOpts, err := cfg.ToOpts(llger)
@@ -184,7 +192,7 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 	// The Alive options must come before the VPN service options: the VPN
 	// service blocks in its packet loop, so services after it never start.
 	nodeOpts = append(nodeOpts, services.Alive(checkInInterval(), aliveScrub, aliveMax)...)
-	nodeOpts = append(nodeOpts, node.WithNetworkService(hostReadyService, mdnsService, addrLogService, connLogService))
+	nodeOpts = append(nodeOpts, node.WithNetworkService(hostReadyService, mdnsService, addrLogService, connLogService, pauseService(pause)))
 
 	nodeOpts = append(nodeOpts, node.WithLibp2pAdditionalOptions(hostOptions(address)...))
 
@@ -210,6 +218,7 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 	sessionCtx = ctx
 	currentNode = n
 	currentMDNS = newMDNSRunner(mdnsTag(normalizeToken(token)))
+	currentPause = pause
 	hostReady = false
 	startedAt = time.Now()
 
@@ -241,6 +250,7 @@ func handleNodeExit(n *node.Node, cancel context.CancelFunc, err error) {
 	if current {
 		runner = currentMDNS
 		currentMDNS = nil
+		currentPause = nil
 		if tunFile != nil {
 			closeTunOnError("node failure")
 		}
@@ -297,6 +307,7 @@ func Stop() {
 	debouncer := netChange
 	runner := currentMDNS
 	currentMDNS = nil
+	currentPause = nil
 	startedAt = time.Time{}
 	hostReady = false
 	selfAddress = ""
