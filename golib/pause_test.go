@@ -254,3 +254,27 @@ func TestACheckInSeenRecentlyCountsWhateverItsTimestamp(t *testing.T) {
 		t.Fatalf("a current check-in counts as %v, want its timestamp", got["b"])
 	}
 }
+
+func TestLookForDevicesStartsADiscoveryRound(t *testing.T) {
+	t.Cleanup(Stop)
+	p := newDiscoveryPause(time.Now)
+	setSession(newTestNode(t), true, nil, context.Background())
+	mu.Lock()
+	currentPause = p
+	mu.Unlock()
+	if !LookForDevices() {
+		t.Fatal("LookForDevices reported no session")
+	}
+	select {
+	case <-p.wake:
+	default:
+		t.Fatal("no discovery round after LookForDevices")
+	}
+}
+
+func TestLookForDevicesWithoutASession(t *testing.T) {
+	Stop()
+	if LookForDevices() {
+		t.Fatal("LookForDevices reported a session after Stop")
+	}
+}

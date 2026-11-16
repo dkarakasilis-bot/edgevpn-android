@@ -3,8 +3,10 @@ package com.kairos.edgevpn
 import androidx.core.content.ContextCompat
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -183,6 +185,25 @@ class MainScreenTest {
             onView(withId(R.id.addressInUseText)).check(matches(not(isDisplayed())))
             onView(withId(R.id.changeAddressButton)).check(matches(not(isDisplayed())))
             onView(withId(R.id.localNetworkClashText)).check(matches(not(isDisplayed())))
+        }
+    }
+
+    @Test
+    fun theMenuOffersLookForDevicesWhileConnected() {
+        snapshot = Snapshots.connectedWithThreeDevices()
+        ActivityScenario.launch(MainActivity::class.java).use {
+            openActionBarOverflowOrOptionsMenu(context)
+            onView(withText("Look for devices now")).check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
+    fun theMenuHasNoLookForDevicesWhileOff() {
+        snapshot = Snapshots.off()
+        ActivityScenario.launch(MainActivity::class.java).use {
+            openActionBarOverflowOrOptionsMenu(context)
+            onView(withText("Settings")).check(matches(isDisplayed()))
+            onView(withText("Look for devices now")).check(doesNotExist())
         }
     }
 }

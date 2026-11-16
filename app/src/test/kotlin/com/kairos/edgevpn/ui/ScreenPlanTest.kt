@@ -160,4 +160,12 @@ class ScreenPlanTest {
         assertFalse(planScreen(model(VpnState.CONNECTED)).showLocalNetworkClash)
         assertFalse(planScreen(model(VpnState.LOOKING, address = "", localNetworkClash = true)).showLocalNetworkClash)
     }
+
+    @Test
+    fun lookForDevicesIsOfferedOnlyWhileTheVpnRuns() {
+        assertTrue(planScreen(model(VpnState.CONNECTED, listOf(row("1", Badge.DIRECT)))).showLookForDevices)
+        assertTrue(planScreen(model(VpnState.LOOKING)).showLookForDevices)
+        assertFalse(planScreen(model(VpnState.OFF)).showLookForDevices)
+        assertFalse(planScreen(model(VpnState.PROBLEM)).showLookForDevices)
+    }
 }

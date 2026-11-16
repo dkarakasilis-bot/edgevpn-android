@@ -264,3 +264,19 @@ func pauseService(p *discoveryPause) node.NetworkService {
 		return nil
 	}
 }
+
+// LookForDevices starts a discovery round now, also while discovery is
+// paused: it searches the current meeting point and announces this device
+// there. A device that joins while every device that is on is paused is
+// found this way without waiting for the hourly round. It reports false
+// when the VPN is off.
+func LookForDevices() bool {
+	mu.Lock()
+	p := currentPause
+	mu.Unlock()
+	if p == nil {
+		return false
+	}
+	p.wakeUp("asked by the user")
+	return true
+}
