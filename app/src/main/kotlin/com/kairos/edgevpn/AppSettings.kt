@@ -81,6 +81,7 @@ object AppSettings {
     // The caller stops the VPN first.
     fun startFresh(c: Context) {
         TokenStore.prefs(c).edit().clear().commit()
+        DataUsageMeter.forget()
         Edgevpn.clearLogs()
     }
 }

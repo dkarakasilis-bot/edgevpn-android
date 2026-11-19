@@ -120,6 +120,7 @@ class EdgeVpnService : VpnService() {
                 if (mySession != session) return@post
                 Log.w(TAG, "Node stopped: $reason")
                 failed = true
+                DataUsageMeter.sample(this@EdgeVpnService)
                 teardown()
             }
         }
@@ -266,6 +267,7 @@ class EdgeVpnService : VpnService() {
     /** Releases everything the service holds, without touching Go's remembered failure. */
     private fun teardown() {
         isRunning = false
+        DataUsageMeter.setNetwork(this, null)
         tunPfd = null
         networkWatcher?.stop()
         networkWatcher = null

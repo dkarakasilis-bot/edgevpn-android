@@ -61,6 +61,14 @@ object DataUsageMeter {
         AppSettings.setDataUsage(c, b.toJson())
     }
 
+    /** Drops the cached book and network, after the stored sums were erased. */
+    @Synchronized
+    fun forget() {
+        book = null
+        network = null
+        warnedSession = 0
+    }
+
     private fun loaded(c: Context): DataUsageBook =
         book ?: DataUsageBook.fromJson(AppSettings.dataUsage(c)).also { book = it }
 }
