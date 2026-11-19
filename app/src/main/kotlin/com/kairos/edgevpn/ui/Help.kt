@@ -68,6 +68,15 @@ private fun texts(term: HelpTerm): HelpTexts = when (term) {
     HelpTerm.START_FRESH -> HelpTexts(R.string.help_start_fresh_title, R.string.help_start_fresh_plain, R.string.help_start_fresh_tech)
     HelpTerm.ADDRESS_IN_USE -> HelpTexts(R.string.help_address_in_use_title, R.string.help_address_in_use_plain, R.string.help_address_in_use_tech)
     HelpTerm.LOCAL_NETWORK_CLASH -> HelpTexts(R.string.help_local_network_clash_title, R.string.help_local_network_clash_plain, R.string.help_local_network_clash_tech)
+    HelpTerm.USAGE_TOTAL -> HelpTexts(R.string.help_usage_total_title, R.string.help_usage_total_plain, R.string.help_usage_total_tech)
+    HelpTerm.USAGE_VPN -> HelpTexts(R.string.help_usage_vpn_title, R.string.help_usage_vpn_plain, R.string.help_usage_vpn_tech)
+    HelpTerm.USAGE_RUNNING -> HelpTexts(R.string.help_usage_running_title, R.string.help_usage_running_plain, R.string.help_usage_running_tech)
+    HelpTerm.USAGE_DEVICES -> HelpTexts(R.string.help_usage_devices_title, R.string.help_usage_devices_plain, R.string.help_usage_devices_tech)
+    HelpTerm.USAGE_DHT -> HelpTexts(R.string.help_usage_dht_title, R.string.help_usage_dht_plain, R.string.help_usage_dht_tech)
+    HelpTerm.USAGE_IDENTIFY -> HelpTexts(R.string.help_usage_identify_title, R.string.help_usage_identify_plain, R.string.help_usage_identify_tech)
+    HelpTerm.USAGE_OTHER -> HelpTexts(R.string.help_usage_other_title, R.string.help_usage_other_plain, R.string.help_usage_other_tech)
+    HelpTerm.USAGE_SETUP -> HelpTexts(R.string.help_usage_setup_title, R.string.help_usage_setup_plain, R.string.help_usage_setup_tech)
+    HelpTerm.USAGE_CONNECTIONS -> HelpTexts(R.string.help_usage_connections_title, R.string.help_usage_connections_plain, R.string.help_usage_connections_tech)
 }
 
 /**
