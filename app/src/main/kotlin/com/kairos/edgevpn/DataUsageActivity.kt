@@ -46,7 +46,6 @@ class DataUsageActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val redraw = object : Runnable {
         override fun run() {
-            DataUsageMeter.sample(this@DataUsageActivity)
             draw()
             handler.postDelayed(this, REFRESH_MS)
         }
@@ -64,6 +63,7 @@ class DataUsageActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        DataUsageMeter.sample(this)
         redraw.run()
     }
 
