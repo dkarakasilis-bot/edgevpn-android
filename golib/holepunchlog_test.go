@@ -62,7 +62,7 @@ var _ = Describe("The hole punch log", func() {
 		// before the app's.
 		var cfg libp2p.Config
 		Expect(cfg.Apply(libp2p.EnableHolePunching())).To(Succeed())
-		Expect(cfg.Apply(hostOptions("10.1.0.4")...)).To(Succeed())
+		Expect(cfg.Apply(hostOptions("10.1.0.4", nil)...)).To(Succeed())
 		Expect(cfg.EnableHolePunching).To(BeTrue())
 		Expect(cfg.HolePunchingOptions).To(HaveLen(1))
 	})

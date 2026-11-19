@@ -4,6 +4,7 @@ import (
 	"runtime"
 
 	libp2p "github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p/core/metrics"
 	"github.com/libp2p/go-libp2p/p2p/protocol/holepunch"
 	"github.com/libp2p/go-libp2p/p2p/transport/tcp"
 	ma "github.com/multiformats/go-multiaddr"
@@ -13,7 +14,7 @@ import (
 // hostOptions returns the libp2p options the app adds to edgevpn's own:
 // the transports, the listen addresses, the muxer and the address factory.
 // address is this device's VPN address, whose /24 the address factory
-// leaves out.
+// leaves out. When usage is not nil it receives the bytes of every stream.
 //
 // NoTransports clears libp2p's default set, then the app adds back TCP and
 // QUIC with protected sockets: outgoing TCP sockets and QUIC's UDP sockets
@@ -34,7 +35,7 @@ import (
 // is a local network that overlaps the VPN's /24: replies to a peer on it
 // would go into the tunnel. The app warns the user about that overlap
 // (SetLocalNetworkClash).
-func hostOptions(address string) []libp2p.Option {
+func hostOptions(address string, usage metrics.Reporter) []libp2p.Option {
 	protectedDialerForAddr := func(_ ma.Multiaddr) (tcp.ContextDialer, error) {
 		if runtime.GOOS == "android" {
 			return newAndroidProtectedDialer(), nil
@@ -79,6 +80,9 @@ func hostOptions(address string) []libp2p.Option {
 		// edgevpn turns hole punching on as well (networkConfig sets
 		// HolePunch); this option comes later and adds the tracer.
 		libp2p.EnableHolePunching(holepunch.WithTracer(holePunchLogger{})),
+	}
+	if usage != nil {
+		opts = append(opts, libp2p.BandwidthReporter(usage))
 	}
 	return append(opts, quicTransportOptions()...)
 }
