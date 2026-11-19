@@ -23,10 +23,11 @@ object DataUsageMeter {
 
     /**
      * Reads the counters and adds what happened since the last reading to the column
-     * of the current network. Does nothing without a Go session.
+     * of the current network. Does nothing without a Go session. With [persist] false
+     * the in-memory book is updated and the stored sums are left alone.
      */
     @Synchronized
-    fun sample(c: Context) {
+    fun sample(c: Context, persist: Boolean = true) {
         val b = loaded(c)
         val uid = Process.myUid()
         val s = parseUsageSample(TrafficStats.getUidRxBytes(uid), TrafficStats.getUidTxBytes(uid), Edgevpn.dataUsage())
@@ -42,7 +43,7 @@ object DataUsageMeter {
                 Log.w(TAG, "Android counted fewer bytes than the libp2p streams in one period: $period")
             }
         }
-        AppSettings.setDataUsage(c, b.toJson())
+        if (persist) AppSettings.setDataUsage(c, b.toJson())
     }
 
     /** Takes a sample for the network that ends, then makes [network] the current one. */
