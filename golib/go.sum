@@ -350,8 +350,8 @@ github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3Rllmb
 github.com/mr-tron/base58 v1.1.2/go.mod h1:BinMc/sQntlIE1frQmRFPUoPA1Zkr8VRgBdjWI2mNwc=
 github.com/mr-tron/base58 v1.3.0 h1:K6Y13R2h+dku0wOqKtecgRnBUBPrZzLZy5aIj8lCcJI=
 github.com/mr-tron/base58 v1.3.0/go.mod h1:2BuubE67DCSWwVfx37JWNG8emOC0sHEU4/HpcYgCLX8=
-github.com/mudler/edgevpn v0.37.0 h1:9yYQ0geEDjivWikO1kJksSOwzcs9VomxjCQBAf/Q3k4=
-github.com/mudler/edgevpn v0.37.0/go.mod h1:kuig6sUNKK2n1h66IokIE9Tq4pFJo95Li2TmZ5YMY+8=
+github.com/mudler/edgevpn v0.37.2 h1:WiCf1nrrgG1Swy6kG7G74jt6Z0XSWH3tUUqEkOK/3tM=
+github.com/mudler/edgevpn v0.37.2/go.mod h1:otEHSbEsVbiqJGaJcgey7ZCKaQC2bxOjhzlN8M9YBZk=
 github.com/mudler/go-libp2p-pubsub v0.0.0-20261110174907-d598e01e0c5c h1:raxuOobTu6fmiYPBe4xEzm+qGGAdtX6L7JDophLrnLc=
 github.com/mudler/go-libp2p-pubsub v0.0.0-20261110174907-d598e01e0c5c/go.mod h1:l00Tc/MXTM/dK69HFxKWIe0yaNwMy5OuU0dyuZaWJa0=
 github.com/mudler/water v0.0.0-20250808092830-dd90dcf09025 h1:WFLP5FHInarYGXi6B/Ze204x7Xy6q/I4nCZnWEyPHK0=

@@ -40,14 +40,15 @@ import com.kairos.edgevpn.ui.StatusModel
 import com.kairos.edgevpn.ui.Using
 import com.kairos.edgevpn.ui.VpnState
 import com.kairos.edgevpn.ui.appendHelpIcon
-import com.kairos.edgevpn.ui.helpTerm
 import com.kairos.edgevpn.ui.formatAgo
+import com.kairos.edgevpn.ui.helpTerm
 import com.kairos.edgevpn.ui.liveValues
 import com.kairos.edgevpn.ui.parseStatus
 import com.kairos.edgevpn.ui.pickUsing
-import com.kairos.edgevpn.ui.showExpanded
 import com.kairos.edgevpn.ui.planScreen
+import com.kairos.edgevpn.ui.showExpanded
 import com.kairos.edgevpn.ui.showHelp
+import edgevpn.Edgevpn
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -85,6 +86,9 @@ class MainActivity : AppCompatActivity() {
     /** The texts the device rows show, to rebuild the rows only when one changes. */
     private var shownRows: List<List<Any?>>? = null
     private var currentButton = MainButton.TURN_ON
+
+    /** Whether the menu offers "Look for devices now", from the last rendered plan. */
+    private var showLookForDevices = false
 
     private val poll = object : Runnable {
         override fun run() {
@@ -199,6 +203,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.findItem(R.id.menu_look_for_devices)?.isVisible = showLookForDevices
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.menu_settings -> {
             openSettings()
@@ -208,7 +217,20 @@ class MainActivity : AppCompatActivity() {
             openLogs()
             true
         }
+        R.id.menu_look_for_devices -> {
+            lookForDevices()
+            true
+        }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    /**
+     * Starts a discovery round now. While every device is connected the phone pauses discovery,
+     * so a device that joins finds this phone only at its next round; this one finds it at once.
+     */
+    private fun lookForDevices() {
+        val message = if (Edgevpn.lookForDevices()) R.string.looking_for_devices_now else R.string.look_for_devices_vpn_off
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun openLogs() {
@@ -258,6 +280,10 @@ class MainActivity : AppCompatActivity() {
     private fun render(m: StatusModel) {
         val plan = planScreen(m)
         renderCard(m, plan.onlyDevice)
+        if (plan.showLookForDevices != showLookForDevices) {
+            showLookForDevices = plan.showLookForDevices
+            invalidateOptionsMenu()
+        }
 
         currentButton = plan.button
         mainButton.setText(
