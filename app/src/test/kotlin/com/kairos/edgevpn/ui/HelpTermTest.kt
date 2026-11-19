@@ -34,7 +34,7 @@ class HelpTermTest {
 
     @Test
     fun oneTermPerGlossaryRow() {
-        assertEquals(23, HelpTerm.values().size)
+        assertEquals(32, HelpTerm.values().size)
     }
 
     @Test
@@ -210,6 +210,15 @@ class HelpTermTest {
             HelpTerm.START_FRESH to LiveScope.PHONE,
             HelpTerm.ADDRESS_IN_USE to LiveScope.PHONE,
             HelpTerm.LOCAL_NETWORK_CLASH to LiveScope.PHONE,
+            HelpTerm.USAGE_TOTAL to LiveScope.PHONE,
+            HelpTerm.USAGE_VPN to LiveScope.PHONE,
+            HelpTerm.USAGE_RUNNING to LiveScope.PHONE,
+            HelpTerm.USAGE_DEVICES to LiveScope.PHONE,
+            HelpTerm.USAGE_DHT to LiveScope.PHONE,
+            HelpTerm.USAGE_IDENTIFY to LiveScope.PHONE,
+            HelpTerm.USAGE_OTHER to LiveScope.PHONE,
+            HelpTerm.USAGE_SETUP to LiveScope.PHONE,
+            HelpTerm.USAGE_CONNECTIONS to LiveScope.PHONE,
         )
         assertEquals(HelpTerm.values().toSet(), expected.keys)
         for (t in HelpTerm.values()) assertEquals(t.name, expected[t], t.liveScope)

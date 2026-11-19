@@ -6,7 +6,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.net.wifi.WifiManager
 import android.os.Handler
@@ -29,6 +31,7 @@ class EdgeVpnService : VpnService() {
         private const val CHANNEL_ID = "edgevpn_status"
         private const val NOTIFICATION_ID = 1
         private const val TICK_MS = 5000L
+        private const val USAGE_SAMPLE_MS = 60_000L
         private const val TEXT_CONNECTED = "Connected"
         private const val TEXT_LOOKING = "Looking for your devices"
 
@@ -103,12 +106,21 @@ class EdgeVpnService : VpnService() {
         }
     }
 
+    private val usageSampler = object : Runnable {
+        override fun run() {
+            if (!isRunning) return
+            DataUsageMeter.sample(this@EdgeVpnService)
+            mainHandler.postDelayed(this, USAGE_SAMPLE_MS)
+        }
+    }
+
     private fun newStatusListener(mySession: Int) = object : StatusListener {
         override fun onStopped(reason: String?) {
             mainHandler.post {
                 if (mySession != session) return@post
                 Log.w(TAG, "Node stopped: $reason")
                 failed = true
+                DataUsageMeter.sample(this@EdgeVpnService)
                 teardown()
             }
         }
@@ -199,6 +211,8 @@ class EdgeVpnService : VpnService() {
             Edgevpn.start(fd.toLong(), token, nodeKey, address, AppSettings.name(this))
             isRunning = true
             mainHandler.postDelayed(statusTicker, TICK_MS)
+            DataUsageMeter.sample(this)
+            mainHandler.postDelayed(usageSampler, USAGE_SAMPLE_MS)
             Log.i(TAG, "VPN started")
             val mySession = session
             networkWatcher = UnderlyingNetworkWatcher(
@@ -219,18 +233,32 @@ class EdgeVpnService : VpnService() {
      * and run mDNS only on a local network. */
     private fun onUnderlyingNetwork(mySession: Int, network: Network?, local: Boolean) {
         if (mySession != session || !isRunning) return
+        DataUsageMeter.setNetwork(this, usageNetworkOfNetwork(network))
         setUnderlyingNetworks(network?.let { arrayOf(it) })
         Edgevpn.networkChanged(local)
+    }
+
+    private fun usageNetworkOfNetwork(network: Network?): UsageNetwork? {
+        if (network == null) return null
+        val cm = getSystemService(ConnectivityManager::class.java)
+        val caps = cm.getNetworkCapabilities(network) ?: return null
+        return usageNetworkOf(
+            wifiOrEthernet = caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET),
+            cellular = caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR),
+        )
     }
 
     /** Tells Go why the start failed, then tears everything down. */
     private fun failStart(reason: String) {
         failed = true
+        DataUsageMeter.sample(this)
         Edgevpn.reportStartFailure(reason)
         teardown()
     }
 
     private fun disconnect() {
+        DataUsageMeter.sample(this)
         Edgevpn.stop()
         teardown()
         Log.i(TAG, "VPN stopped")
@@ -239,12 +267,14 @@ class EdgeVpnService : VpnService() {
     /** Releases everything the service holds, without touching Go's remembered failure. */
     private fun teardown() {
         isRunning = false
+        DataUsageMeter.setNetwork(this, null)
         tunPfd = null
         networkWatcher?.stop()
         networkWatcher = null
         Edgevpn.setStatusListener(null)
         Edgevpn.setSocketProtector(null)
         mainHandler.removeCallbacks(statusTicker)
+        mainHandler.removeCallbacks(usageSampler)
         multicastLock?.let {
             if (it.isHeld) it.release()
             multicastLock = null

@@ -14,7 +14,7 @@ var _ = Describe("hostOptions", func() {
 	})
 
 	It("listens on TCP and QUIC, over IPv4 and IPv6", func() {
-		h, err := libp2p.New(hostOptions("10.1.0.4")...)
+		h, err := libp2p.New(hostOptions("10.1.0.4", nil)...)
 		Expect(err).NotTo(HaveOccurred())
 		DeferCleanup(h.Close)
 

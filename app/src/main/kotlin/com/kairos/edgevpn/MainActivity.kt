@@ -213,6 +213,10 @@ class MainActivity : AppCompatActivity() {
             openSettings()
             true
         }
+        R.id.menu_data_usage -> {
+            startActivity(Intent(this, DataUsageActivity::class.java))
+            true
+        }
         R.id.menu_logs -> {
             openLogs()
             true

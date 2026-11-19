@@ -40,6 +40,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".DataUsageActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".LogsActivity"
             android:exported="false" />
 

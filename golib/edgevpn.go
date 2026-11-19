@@ -43,6 +43,9 @@ var (
 	// currentPause holds back DHT discovery for the current session; nil
 	// when the VPN is off.
 	currentPause *services.DiscoveryPause
+	// currentUsage counts the current session's libp2p stream bytes; nil
+	// when the VPN is off.
+	currentUsage *usageReporter
 )
 
 // GenerateNodeKey returns a new Ed25519 private key in libp2p's marshaled
@@ -192,10 +195,11 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 	nodeOpts = append(nodeOpts, node.WithPrivKey(nodeKey))
 	// The Alive options must come before the VPN service options: the VPN
 	// service blocks in its packet loop, so services after it never start.
+	usage := newUsageReporter()
 	nodeOpts = append(nodeOpts, services.Alive(checkInInterval(), aliveScrub, aliveMax)...)
-	nodeOpts = append(nodeOpts, node.WithNetworkService(hostReadyService, mdnsService, addrLogService, connLogService, pause.NetworkService()))
+	nodeOpts = append(nodeOpts, node.WithNetworkService(hostReadyService, mdnsService, addrLogService, connLogService, pause.NetworkService(), usageService(usage)))
 
-	nodeOpts = append(nodeOpts, node.WithLibp2pAdditionalOptions(hostOptions(address)...))
+	nodeOpts = append(nodeOpts, node.WithLibp2pAdditionalOptions(hostOptions(address, usage)...))
 
 	vpnOpts = append(vpnOpts, vpn.WithInterface(tunFile))
 
@@ -220,6 +224,7 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 	currentNode = n
 	currentMDNS = newMDNSRunner(mdnsTag(normalizeToken(token)))
 	currentPause = pause
+	currentUsage = usage
 	hostReady = false
 	startedAt = time.Now()
 
@@ -309,6 +314,7 @@ func Stop() {
 	runner := currentMDNS
 	currentMDNS = nil
 	currentPause = nil
+	currentUsage = nil
 	startedAt = time.Time{}
 	hostReady = false
 	selfAddress = ""

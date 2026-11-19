@@ -4,7 +4,9 @@ package com.kairos.edgevpn.ui
 enum class HelpTerm {
     CONNECTED, LOOKING, OFF, PROBLEM, THIS_PHONE, USING, YOUR_DEVICES, DIRECT, VIA_HELPER, OFFLINE,
     SAME_NETWORK, FINDING, HELPERS, LAST_HEARD, NETWORK_KEY, NAME, ADDRESS, DETAILED_LOGS, RELAY_FOR_OTHERS, PHONE_ID,
-    START_FRESH, ADDRESS_IN_USE, LOCAL_NETWORK_CLASH;
+    START_FRESH, ADDRESS_IN_USE, LOCAL_NETWORK_CLASH,
+    USAGE_TOTAL, USAGE_VPN, USAGE_RUNNING, USAGE_DEVICES, USAGE_DHT, USAGE_IDENTIFY, USAGE_OTHER, USAGE_SETUP,
+    USAGE_CONNECTIONS;
 
     /** What the live values of this term describe, which names their heading in the sheet. */
     val liveScope: LiveScope
@@ -13,7 +15,8 @@ enum class HelpTerm {
             YOUR_DEVICES, LAST_HEARD -> LiveScope.NETWORK
             CONNECTED, LOOKING, OFF, PROBLEM, THIS_PHONE, USING, FINDING, HELPERS, NETWORK_KEY, NAME,
             ADDRESS, DETAILED_LOGS, RELAY_FOR_OTHERS, PHONE_ID, START_FRESH, ADDRESS_IN_USE,
-            LOCAL_NETWORK_CLASH -> LiveScope.PHONE
+            LOCAL_NETWORK_CLASH, USAGE_TOTAL, USAGE_VPN, USAGE_RUNNING, USAGE_DEVICES, USAGE_DHT, USAGE_IDENTIFY,
+            USAGE_OTHER, USAGE_SETUP, USAGE_CONNECTIONS -> LiveScope.PHONE
         }
 
     /**
@@ -113,7 +116,9 @@ fun liveValues(
         HelpTerm.PHONE_ID -> add("Phone ID", model.selfId)
         HelpTerm.ADDRESS_IN_USE -> add("Address", model.selfAddress)
         HelpTerm.LOCAL_NETWORK_CLASH -> add("VPN route", routeOf(model.selfAddress))
-        HelpTerm.OFF, HelpTerm.FINDING, HelpTerm.NETWORK_KEY, HelpTerm.START_FRESH -> Unit
+        HelpTerm.OFF, HelpTerm.FINDING, HelpTerm.NETWORK_KEY, HelpTerm.START_FRESH, HelpTerm.USAGE_TOTAL,
+        HelpTerm.USAGE_VPN, HelpTerm.USAGE_RUNNING, HelpTerm.USAGE_DEVICES, HelpTerm.USAGE_DHT,
+        HelpTerm.USAGE_IDENTIFY, HelpTerm.USAGE_OTHER, HelpTerm.USAGE_SETUP, HelpTerm.USAGE_CONNECTIONS -> Unit
     }
     return out
 }
