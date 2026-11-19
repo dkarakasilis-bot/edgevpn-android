@@ -6,7 +6,7 @@ require (
 	github.com/ipfs/go-log/v2 v2.9.2
 	github.com/libp2p/go-libp2p v0.51.0
 	github.com/marcopolo/simnet v0.0.7
-	github.com/mudler/edgevpn v0.37.0
+	github.com/mudler/edgevpn v0.37.2
 	github.com/multiformats/go-multiaddr v0.16.1
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
@@ -152,5 +152,3 @@ require (
 
 // mudler's fork, which edgevpn also uses, runs pubsub over relayed connections and keeps a peer's subscriptions when a pubsub stream is reset.
 replace github.com/libp2p/go-libp2p-pubsub => github.com/mudler/go-libp2p-pubsub v0.0.0-20261110174907-d598e01e0c5c
-
-replace github.com/mudler/edgevpn => github.com/jimmykarily/edgevpn v0.0.0-20261116145702-21eb431e6972
