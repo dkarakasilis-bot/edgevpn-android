@@ -180,7 +180,10 @@ var usageNames = [usageCategories]string{"vpn", "devices", "dht", "identify", "o
 // {"session": <start time in ns>, "in": {"vpn": n, "devices": n, "dht": n,
 // "identify": n, "other": n}, "out": {...}, "connsDevices": n,
 // "connsOthers": n}. The counters start at zero with each session, and
-// "session" changes with it. Without a session the result is {"session":0}.
+// "session" changes with it. After the node failed on its own, the counters
+// of the finished session stay readable until the next Start or a Stop, so
+// the caller can take a last reading. Without a session the result is
+// {"session":0}.
 func DataUsage() string {
 	mu.Lock()
 	r, started := currentUsage, startedAt

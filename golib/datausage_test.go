@@ -3,6 +3,7 @@ package edgevpn
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"sync"
 	"testing"
@@ -220,5 +221,33 @@ func TestStreamBytesReachTheReporter(t *testing.T) {
 			t.Fatalf("totals = %+v, want at least 1000 bytes out as other", r.totals())
 		}
 		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func TestDataUsageSurvivesANodeFailure(t *testing.T) {
+	t.Cleanup(func() { Stop(); ClearLogs() })
+	n := newTestNode(t)
+	r := newUsageReporter()
+	r.LogRecvMessageStream(5, "/ipfs/kad/1.0.0", peer.ID("stranger"))
+	started := time.Now()
+	mu.Lock()
+	currentNode, currentUsage, startedAt = n, r, started
+	mu.Unlock()
+
+	handleNodeExit(n, func() {}, errors.New("boom"))
+
+	var got struct {
+		Session int64            `json:"session"`
+		In      map[string]int64 `json:"in"`
+	}
+	if err := json.Unmarshal([]byte(DataUsage()), &got); err != nil {
+		t.Fatal(err)
+	}
+	if got.Session != started.UnixNano() || got.In["dht"] != 5 {
+		t.Errorf("after the node failed, DataUsage() = %s", DataUsage())
+	}
+	Stop()
+	if got := DataUsage(); got != `{"session":0}` {
+		t.Errorf("after Stop, DataUsage() = %s", got)
 	}
 }

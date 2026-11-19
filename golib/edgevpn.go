@@ -257,7 +257,6 @@ func handleNodeExit(n *node.Node, cancel context.CancelFunc, err error) {
 		runner = currentMDNS
 		currentMDNS = nil
 		currentPause = nil
-		currentUsage = nil
 		if tunFile != nil {
 			closeTunOnError("node failure")
 		}

@@ -61,9 +61,10 @@ object DataUsageMeter {
         AppSettings.setDataUsage(c, b.toJson())
     }
 
-    /** Drops the cached book and network, after the stored sums were erased. */
+    /** Erases the stored sums and the cached book and network, as one step. */
     @Synchronized
-    fun forget() {
+    fun forget(c: Context) {
+        AppSettings.removeDataUsage(c)
         book = null
         network = null
         warnedSession = 0

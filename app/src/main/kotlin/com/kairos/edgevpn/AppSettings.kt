@@ -77,11 +77,15 @@ object AppSettings {
         TokenStore.prefs(c).edit().putString(KEY_DATA_USAGE, json).apply()
     }
 
+    fun removeDataUsage(c: Context) {
+        TokenStore.prefs(c).edit().remove(KEY_DATA_USAGE).commit()
+    }
+
     // Forgets the token, the node key and every setting, and empties the log buffer.
     // The caller stops the VPN first.
     fun startFresh(c: Context) {
         TokenStore.prefs(c).edit().clear().commit()
-        DataUsageMeter.forget()
+        DataUsageMeter.forget(c)
         Edgevpn.clearLogs()
     }
 }
