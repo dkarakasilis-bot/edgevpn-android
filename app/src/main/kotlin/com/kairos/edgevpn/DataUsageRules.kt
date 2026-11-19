@@ -47,6 +47,22 @@ data class UsageColumn(
         total + o.total, vpn + o.vpn, devices + o.devices, dht + o.dht, identify + o.identify, other + o.other,
         connsDevices + o.connsDevices, connsOthers + o.connsOthers,
     )
+
+    operator fun minus(o: UsageColumn) = UsageColumn(
+        total - o.total, vpn - o.vpn, devices - o.devices, dht - o.dht, identify - o.identify, other - o.other,
+        connsDevices - o.connsDevices, connsOthers - o.connsOthers,
+    )
+}
+
+/** Whether the counted streams of a period add up to more than Android's total for it. */
+fun streamsExceedTotal(c: UsageColumn): Boolean =
+    c.vpn + c.devices + c.dht + c.identify + c.other > c.total
+
+/** The network of a period from the transports of the network: Wi-Fi wins over cellular, null when neither. */
+fun usageNetworkOf(wifiOrEthernet: Boolean, cellular: Boolean): UsageNetwork? = when {
+    wifiOrEthernet -> UsageNetwork.WIFI
+    cellular -> UsageNetwork.MOBILE
+    else -> null
 }
 
 private const val CATEGORIES = 5

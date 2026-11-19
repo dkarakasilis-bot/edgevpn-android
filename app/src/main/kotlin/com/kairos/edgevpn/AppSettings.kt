@@ -12,6 +12,7 @@ object AppSettings {
     private const val KEY_RELAY_FOR_OTHERS = "relay_for_others"
     private const val KEY_EXTRA_PEERS = "extra_peers"
     private const val KEY_CHECK_IN_SECONDS = "check_in_seconds"
+    private const val KEY_DATA_USAGE = "data_usage"
     private const val DEFAULT_ADDRESS = "10.1.0.2"
 
     fun address(c: Context): String =
@@ -66,6 +67,14 @@ object AppSettings {
 
     fun setCheckInSeconds(c: Context, v: Int) {
         TokenStore.prefs(c).edit().putInt(KEY_CHECK_IN_SECONDS, v).apply()
+    }
+
+    /** The data usage book as JSON, see DataUsageBook.toJson; null before the first sample. */
+    fun dataUsage(c: Context): String? =
+        TokenStore.prefs(c).getString(KEY_DATA_USAGE, null)
+
+    fun setDataUsage(c: Context, json: String) {
+        TokenStore.prefs(c).edit().putString(KEY_DATA_USAGE, json).apply()
     }
 
     // Forgets the token, the node key and every setting, and empties the log buffer.

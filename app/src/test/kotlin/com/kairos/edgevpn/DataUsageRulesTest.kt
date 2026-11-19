@@ -1,6 +1,7 @@
 package com.kairos.edgevpn
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -142,5 +143,21 @@ class DataUsageRulesTest {
         assertEquals(12L, s.connsOthers)
         assertNull(parseUsageSample(1, 2, """{"session":0}"""))
         assertNull(parseUsageSample(1, 2, "garbage"))
+    }
+
+    @Test
+    fun usageNetworkFollowsTheTransport() {
+        assertEquals(UsageNetwork.WIFI, usageNetworkOf(wifiOrEthernet = true, cellular = false))
+        assertEquals(UsageNetwork.MOBILE, usageNetworkOf(wifiOrEthernet = false, cellular = true))
+        assertEquals(UsageNetwork.WIFI, usageNetworkOf(wifiOrEthernet = true, cellular = true))
+        assertNull(usageNetworkOf(wifiOrEthernet = false, cellular = false))
+    }
+
+    @Test
+    fun streamsExceedTotalOnlyWhenAndroidCountedLess() {
+        val fewer = UsageColumn(100, 60, 30, 5, 5, 5, 0, 0)
+        val equal = UsageColumn(100, 60, 30, 5, 5, 0, 0, 0)
+        assertTrue(streamsExceedTotal(fewer))
+        assertFalse(streamsExceedTotal(equal))
     }
 }
