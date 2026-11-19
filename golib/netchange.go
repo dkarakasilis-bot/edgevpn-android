@@ -196,7 +196,7 @@ func runNetChange(onLocal bool) {
 	// discovery round finds the others and announces the phone's new
 	// addresses at the meeting point.
 	if p != nil {
-		p.wakeUp("the network changed")
+		p.WakeUp("the network changed")
 	}
 }
 

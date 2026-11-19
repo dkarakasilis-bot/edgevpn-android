@@ -42,7 +42,7 @@ var (
 	currentMDNS *mdnsRunner
 	// currentPause holds back DHT discovery for the current session; nil
 	// when the VPN is off.
-	currentPause *discoveryPause
+	currentPause *services.DiscoveryPause
 )
 
 // GenerateNodeKey returns a new Ed25519 private key in libp2p's marshaled
@@ -177,9 +177,10 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 
 	llger := &bufferLogger{}
 	cfg := networkConfig(normalizeToken(token), address)
-	pause := newDiscoveryPause(time.Now)
+	// One pause per session: it keeps state for one node run.
+	pause := services.NewDiscoveryPause(llger, checkInInterval())
 	cfg.Discovery.Pause = pause.Pause
-	cfg.Discovery.Wake = pause.wake
+	cfg.Discovery.Wake = pause.Wake()
 
 	SetMinLogLevel(cfg.LogLevel)
 	nodeOpts, vpnOpts, err := cfg.ToOpts(llger)
@@ -192,7 +193,7 @@ func Start(fd int, token string, nodeKey []byte, address string, name string) er
 	// The Alive options must come before the VPN service options: the VPN
 	// service blocks in its packet loop, so services after it never start.
 	nodeOpts = append(nodeOpts, services.Alive(checkInInterval(), aliveScrub, aliveMax)...)
-	nodeOpts = append(nodeOpts, node.WithNetworkService(hostReadyService, mdnsService, addrLogService, connLogService, pauseService(pause)))
+	nodeOpts = append(nodeOpts, node.WithNetworkService(hostReadyService, mdnsService, addrLogService, connLogService, pause.NetworkService()))
 
 	nodeOpts = append(nodeOpts, node.WithLibp2pAdditionalOptions(hostOptions(address)...))
 
