@@ -235,6 +235,7 @@
 
                         <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/saveMobileDataSwitch"
+                            android:contentDescription="@string/setting_save_mobile_data"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp" />
